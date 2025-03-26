@@ -1,0 +1,7 @@
+ONNX Model Benchmark Results
+========================================
+FP32 Model: C:/Users/user/Desktop/Pytorch_onnx/Data_Labelling_Conversion/onnx/resnet50_dog_cat.onnx
+Avg Latency per inference: 0.035730 seconds
+
+Quantized INT8 Model: C:/Users/user/Desktop/Pytorch_onnx/Data_Labelling_Conversion/onnx/resnet50_quantized.onnx
+Avg Latency per inference: 0.054627 seconds
