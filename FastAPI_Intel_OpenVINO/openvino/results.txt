@@ -1,0 +1,9 @@
+🔹 **Model Inference Performance Comparison** 🔹
+
+Metric                   ONNX Model          OpenVINO Model
+======================================================================
+Batch Size               8                   8
+Average Latency (ms)     224.14              116.68
+Throughput (images/sec)  35.69               68.57
+Avg CPU Usage (%)        29.26               37.22
+Avg Memory Usage (MB)    -3.88               2.34
