@@ -7,7 +7,7 @@ import cv2
 app = FastAPI()
 
 # Ensure GPU usage if available
-providers = ["CUDAExecutionProvider"] if "CUDAExecutionProvider" in ort.get_available_providers() else ["CPUExecutionProvider"]
+providers = ["CUDAExecutionProvider"]
 
 # Load ONNX model for GPU inference
 onnx_session = ort.InferenceSession("C:/Users/user/Desktop/tensorrt-api-deployment/Data_Labelling_Conversion/onnx/resnet50_dog_cat.onnx", providers=providers)
