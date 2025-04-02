@@ -1,16 +1,16 @@
-import onnxruntime as ort
-import numpy as np
 import time
-import psutil
 import os
+import psutil
+import numpy as np
+import onnxruntime as ort
 from PIL import Image
 from openvino.runtime import Core
 
 # Paths
-onnx_model_path = "/Users/swedha/Documents/tensorrt-api-deployment/Data_Labelling_Conversion/onnx/resnet50_dog_cat.onnx"
-openvino_model_path = "/Users/swedha/Documents/tensorrt-api-deployment/openvino_model/resnet50_dog_cat.xml"
-results_file = "/Users/swedha/Documents/tensorrt-api-deployment/results.txt"
-image_folder = "/Users/swedha/Documents/tensorrt-api-deployment/test_images"
+onnx_model_path = "C:/Users/user/Desktop/tensorrt-api-deployment/Data_Labelling_Conversion/onnx/resnet50_dog_cat.onnx"
+openvino_model_path = "C:/Users/user/Desktop/tensorrt-api-deployment/FastAPI_Intergrating_Intel_OpenVINO_for_optimization/openvino/openvino_model/resnet50_dog_cat.xml"
+results_file = "C:/Users/user/Desktop/tensorrt-api-deployment/FastAPI_Intergrating_Intel_OpenVINO_for_optimization/openvino/results.txt"
+image_folder = "C:/Users/user/Desktop/tensorrt-api-deployment/FastAPI_Intergrating_Intel_OpenVINO_for_optimization/openvino/test_images"
 
 # Load ONNX model
 try:
@@ -39,6 +39,7 @@ def preprocess_image(image_path):
     image = image.resize((224, 224))  # Resize to match model input
     image_array = np.asarray(image).astype(np.float32) / 255.0  # Normalize
     image_array = np.transpose(image_array, (2, 0, 1))  # Convert HWC to CHW
+    image_array = np.expand_dims(image_array, axis=0)  # Add batch dimension
     return image_array
 
 def load_batch_images(image_folder, batch_size=8):
@@ -53,7 +54,7 @@ def load_batch_images(image_folder, batch_size=8):
         exit()
 
     images = [preprocess_image(img) for img in image_files[:batch_size]]
-    images = np.stack(images, axis=0)  # Convert to batch format
+    images = np.vstack(images)  # Convert to batch format
     return images, image_files[:batch_size]
 
 def run_inference(session, images, input_name):
@@ -61,23 +62,13 @@ def run_inference(session, images, input_name):
     return session.run(None, {input_name: images})[0]
 
 def run_openvino_inference(compiled_model, images):
-    """Run inference on OpenVINO model (Batch processing)."""
+    """Run inference on OpenVINO model."""
     infer_request = compiled_model.create_infer_request()
-    
-    # Ensure batch size matches model expectation
-    if images.shape[0] == 1:
-        infer_request.infer({compiled_model.input(0): images})
-        return infer_request.get_output_tensor(0).data
-    else:
-        results = []
-        for image in images:  # Process images one by one
-            input_tensor = np.expand_dims(image, axis=0)  # Shape: (1, 3, 224, 224)
-            infer_request.infer({compiled_model.input(0): input_tensor})
-            results.append(infer_request.get_output_tensor(0).data)
-        return np.vstack(results)
+    infer_request.infer({compiled_model.input(0): images})
+    return infer_request.get_output_tensor(0).data
 
 def benchmark_model(session, images, input_name, model_name, num_runs=50):
-    """Run batch inference and measure performance metrics."""
+    """Benchmark model performance."""
     times, cpu_usages, memory_usages = [], [], []
 
     for _ in range(num_runs):
@@ -126,15 +117,16 @@ if __name__ == "__main__":
     if onnx_metrics and openvino_metrics:
         # Save results
         with open(results_file, "w", encoding="utf-8") as f:
-            f.write("🔹 **Model Inference Performance Comparison** 🔹\n\n")
+            f.write("🔹 **Model Performance Comparison** 🔹\n\n")
             f.write(f"{'Metric':<25}{'ONNX Model':<20}{'OpenVINO Model'}\n")
             f.write("="*70 + "\n")
             f.write(f"{'Batch Size':<25}{batch_size:<20}{batch_size}\n")
-            f.write(f"{'Average Latency (ms)':<25}{onnx_metrics[0]:<20.2f}{openvino_metrics[0]:.2f}\n")
-            f.write(f"{'Throughput (images/sec)':<25}{onnx_metrics[1]:<20.2f}{openvino_metrics[1]:.2f}\n")
+            f.write(f"{'Avg Latency (ms)':<25}{onnx_metrics[0]:<20.2f}{openvino_metrics[0]:.2f}\n")
+            f.write(f"{'Throughput (img/sec)':<25}{onnx_metrics[1]:<20.2f}{openvino_metrics[1]:.2f}\n")
             f.write(f"{'Avg CPU Usage (%)':<25}{onnx_metrics[2]:<20.2f}{openvino_metrics[2]:.2f}\n")
             f.write(f"{'Avg Memory Usage (MB)':<25}{onnx_metrics[3]:<20.2f}{openvino_metrics[3]:.2f}\n")
 
         print(f"\n✅ Benchmark results saved to: {results_file}")
     else:
         print("\n❌ Benchmark failed due to errors.")
+

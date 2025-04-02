@@ -1,1 +1,0 @@
-print("fastapi for tensorrt")

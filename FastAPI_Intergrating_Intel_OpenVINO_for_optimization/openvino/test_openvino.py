@@ -5,7 +5,7 @@ import numpy as np
 ie = Core()
 
 # Load the OpenVINO model
-model_path = "/Users/swedha/Documents/tensorrt-api-deployment/openvino_model/resnet50_dog_cat.xml"
+model_path = "C:/Users/user/Desktop/tensorrt-api-deployment/FastAPI_Intergrating_Intel_OpenVINO_for_optimization/openvino/openvino_model/resnet50_dog_cat.xml"
 compiled_model = ie.compile_model(model_path, "CPU")
 
 # Get input and output layers

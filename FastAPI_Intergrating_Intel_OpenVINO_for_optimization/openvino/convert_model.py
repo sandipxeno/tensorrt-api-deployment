@@ -2,18 +2,14 @@ import torch
 from openvino.tools.mo import convert_model
 import torchvision.models as models
 
-# Load the model architecture (Make sure it matches the saved model)
-model = models.resnet18()  # Change this to your model architecture
+import openvino.tools.mo as mo
 
-# Load the state dictionary
-model.load_state_dict(torch.load("/Users/swedha/Documents/tensorrt-api-deployment/Data_Labelling_Techinque(model)/model/resnet50_binary_classification.pth"))
+# Define paths
+onnx_model_path = "C:/Users/user/Desktop/tensorrt-api-deployment/Data_Labelling_Conversion/onnx/resnet50_dog_cat.onnx"
+ir_output_dir = "C:/Users/user/Desktop/tensorrt-api-deployment/FastAPI_Intergrating_Intel_OpenVINO_for_optimization/openvino/openvino_model"
 
-# Set the model to evaluation mode
-model.eval()
-
-# Convert it to OpenVINO IR format
-ov_model = convert_model(model)
-ov_model.save("/Users/swedha/Documents/tensorrt-api-deployment/openvino_model/model.xml")
+# Convert ONNX to OpenVINO IR
+mo.convert_model(onnx_model_path, output_dir=ir_output_dir, model_name="model")
 
 print("Model successfully converted to OpenVINO IR format!")
 
