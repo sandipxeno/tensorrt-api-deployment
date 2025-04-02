@@ -4,7 +4,7 @@ import numpy as np
 import onnxruntime as ort
 
 # Load ONNX model
-onnx_session = ort.InferenceSession("D:/Prodigal-3/tensorrt-api-deployment/Data_Labelling_Conversion/onnx/resnet50_dog_cat.onnx", providers=["CPUExecutionProvider"])
+onnx_session = ort.InferenceSession("C:/Users/user/Desktop/tensorrt-api-deployment/Data_Labelling_Conversion/onnx/resnet50_dog_cat.onnx", providers=["CPUExecutionProvider"])
 
 # Define input shape
 IMG_SIZE = 224  # Modify this if needed
