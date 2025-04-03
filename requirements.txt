@@ -1,0 +1,17 @@
+torch
+torchvision
+onnx
+onnxruntime
+openvino
+openvino-dev
+pycuda
+fastapi
+uvicorn
+numpy
+opencv-python
+pydantic
+ngrok
+pillow
+scipy
+python-multipart
+pyngrok
